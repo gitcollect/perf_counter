@@ -1,29 +1,19 @@
-#
-# Flags d'erreurs:
-#
+KDIR := /lib/modules/$(shell uname -r)/build
+CC = gcc
+
 ERROR_FLAGS = -std=gnu99 -Wall -Werror -O0 -g
+CFLAGS1 = $(ERROR_FLAGS) -D_GNU_SOURCE
+LDFLAGS1 = $(ERROR_FLAGS)
 
-#
-# Flags pour le compilateur:
-#
-CFLAGS = $(ERROR_FLAGS) -D_GNU_SOURCE
+obj-m += pmu_msr_kernel.o
 
-#
-# Flags pour l'editeur de liens:
-#
-LDFLAGS = $(ERROR_FLAGS)
+all: kernel user
 
-#
-# Construction des programmes:
-#
-all: clean pmu_msr
+kernel:
+	$(MAKE) -C $(KDIR) SUBDIRS=$(PWD) modules
 
-pmu_msr: pmu_msr.c
-	gcc $(CFLAGS) -c pmu_msr.c 
-	gcc -o pmu_msr pmu_msr.o $(LDFLAGS)
+user: pmu_msr_user.c
+	$(CC) $(CFLAGS1) -o pmu_msr_user pmu_msr_user.c $(LDFLAGS1)
 
-#
-# Nettoyage:
-#
 clean:
-	rm -f *.o cachegrind.out.* perf.data* *~ core mem_bound mem_bound_infinite out pmu_msr
+	rm -rf *.o pmu_msr_user *.ko *.mod.* *.cmd .module* modules* Module* .*.cmd .tmp*
