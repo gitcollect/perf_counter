@@ -10,11 +10,13 @@ import string
 import sys 
 import getopt
 import locale
+import argparse
 
-PID = "25677"
 
-MAX_CONCURRENCY = 50
-ROUND_NR = 5
+PID = ""
+CONCURRENCY = 0
+ROUND_NR = 0
+INTERVAL = ""
 
 event_list = []
 event_value = []
@@ -53,7 +55,7 @@ def init_event_list():
 		event_value.append(0)
 
 def execute_cmd(event_name, pid, output):
-	cmd = "perf stat -e " + event_name + " -p " + pid + " sleep 0.1 " +  "2>>" + output
+	cmd = "perf stat -e " + event_name + " -p " + pid + " sleep "+ INTERVAL +  " 2>>" + output
 	os.popen(cmd)
 
 def process(output):
@@ -83,7 +85,7 @@ def main(argv):
 	for event in event_list:
 		index = index + 1
 		event_temp = event_temp + event + ","
-		if (index == MAX_CONCURRENCY):
+		if (index == CONCURRENCY):
 			index = 0
 			event_name_list.append(event_temp[:-1])
 			event_temp = ""
@@ -98,9 +100,26 @@ def main(argv):
 			execute_cmd(event_name, PID, "output")
 
 	process("output")
+
 	result = open('data', 'w')
 	result.writelines("%d "% (item/ROUND_NR) for item in event_value)
 	result.close()
 
 if __name__ == "__main__":
+
+	parser = argparse.ArgumentParser()
+	parser.add_argument("pid", help="specify the process id")
+	parser.add_argument("-c", "--concurrency", type=int, default=50,
+			    help="specify how many counters concurrently")
+	parser.add_argument("-n", "--round_nr", type=int, default=5,
+			    help="specify how many rounds you want to counter")
+	parser.add_argument("-i", "--interval", default="0.1",
+			    help="specify how long for each round")
+	args = parser.parse_args()
+
+	PID = args.pid
+	CONCURRENCY = args.concurrency
+	ROUND_NR = args.round_nr
+	INTERVAL = args.interval
+
 	main(sys.argv[1:])
