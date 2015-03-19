@@ -20,8 +20,8 @@ event_list = []
 event_value = []
 
 def init_event_list():
-	event_list.append('cache-references')
-	event_list.append('cache-misses')
+#	event_list.append('cache-references')
+#	event_list.append('cache-misses')
 	event_list.append('L1-dcache-loads')
 	event_list.append('L1-dcache-load-misses')
 	event_list.append('L1-dcache-stores')
@@ -53,7 +53,7 @@ def init_event_list():
 		event_value.append(0)
 
 def execute_cmd(event_name, pid, output):
-	cmd = "perf stat -e " + event_name + " -p " + pid + " sleep 1 " +  "2>>" + output
+	cmd = "perf stat -e " + event_name + " -p " + pid + " sleep 0.1 " +  "2>>" + output
 	os.popen(cmd)
 
 def process(output):
@@ -98,9 +98,9 @@ def main(argv):
 			execute_cmd(event_name, PID, "output")
 
 	process("output")
-	for i in range(len(event_list)):
-		print '{0}:	{1}'.format(event_list[i], event_value[i]/ROUND_NR)
-
+	result = open('data', 'w')
+	result.writelines("%d "% (item/ROUND_NR) for item in event_value)
+	result.close()
 
 if __name__ == "__main__":
 	main(sys.argv[1:])
