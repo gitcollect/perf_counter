@@ -12,7 +12,6 @@ import getopt
 import locale
 import argparse
 
-
 PID = ""
 CONCURRENCY = 0
 ROUND_NR = 0
@@ -20,6 +19,10 @@ INTERVAL = ""
 
 event_list = []
 event_value = []
+
+def median(lst):
+	lst.sort()
+        return lst[len(lst)/2]
 
 def init_event_list():
 #	event_list.append('cache-references')
@@ -52,7 +55,7 @@ def init_event_list():
 	event_list.append('node-prefetch-misses')
 
 	for i in range(len(event_list)):
-		event_value.append(0)
+		event_value.append([])
 
 def execute_cmd(event_name, pid, output):
 	cmd = "perf stat -e " + event_name + " -p " + pid + " sleep "+ INTERVAL +  " 2>>" + output
@@ -72,9 +75,9 @@ def process(output):
 			for j in range(len(activity_list)):
 				if (activity_list[j] == event_list[i]):
 					try:
-						event_value[i] = event_value[i] + locale.atoi(activity_list[j-1])
+						event_value[i].append(locale.atoi(activity_list[j-1]))
 					except (TypeError, ValueError, AttributeError):
-						event_value[i] = event_value[i]
+						event_value[i].append(0)
 
 def main(argv):
 	init_event_list()
@@ -101,8 +104,9 @@ def main(argv):
 
 	process("output")
 
-	result = open('data', 'w')
-	result.writelines("%d "% (item/ROUND_NR) for item in event_value)
+	result = open('data', 'a')
+	result.writelines("%d "% (median(item)) for item in event_value)
+	result.writelines("\n")
 	result.close()
 
 if __name__ == "__main__":
