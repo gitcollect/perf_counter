@@ -16,6 +16,7 @@ PID = ""
 CONCURRENCY = 0
 ROUND_NR = 0
 INTERVAL = ""
+OPTIONS = ""
 
 event_list = []
 event_value = []
@@ -25,8 +26,8 @@ def median(lst):
         return lst[len(lst)/2]
 
 def init_event_list():
-#	event_list.append('cache-references')
-#	event_list.append('cache-misses')
+	event_list.append('cpu-cycles')
+	event_list.append('instructions')
 	event_list.append('L1-dcache-loads')
 	event_list.append('L1-dcache-load-misses')
 	event_list.append('L1-dcache-stores')
@@ -73,7 +74,7 @@ def process(output):
 		for activity in activities:
 			activity_list = activity.split(' ')
 			for j in range(len(activity_list)):
-				if (activity_list[j] == event_list[i]):
+				if ((activity_list[j] == event_list[i]) or (activity_list[j] == event_list[i] + OPTIONS)):
 					try:
 						event_value[i].append(locale.atoi(activity_list[j-1]))
 					except (TypeError, ValueError, AttributeError):
@@ -87,7 +88,7 @@ def main(argv):
 	event_temp = ""
 	for event in event_list:
 		index = index + 1
-		event_temp = event_temp + event + ","
+		event_temp = event_temp + event + OPTIONS + ","
 		if (index == CONCURRENCY):
 			index = 0
 			event_name_list.append(event_temp[:-1])
@@ -119,11 +120,13 @@ if __name__ == "__main__":
 			    help="specify how many rounds you want to counter")
 	parser.add_argument("-i", "--interval", default="0.1",
 			    help="specify how long for each round")
+	parser.add_argument("-o", "--options", default="ukG",
+			    help="what to measure for perf")
 	args = parser.parse_args()
 
 	PID = args.pid
 	CONCURRENCY = args.concurrency
 	ROUND_NR = args.round_nr
 	INTERVAL = args.interval
-
+	OPTIONS = ":" + args.options
 	main(sys.argv[1:])

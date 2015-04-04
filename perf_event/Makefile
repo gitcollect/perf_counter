@@ -1,15 +1,16 @@
+KDIR := /lib/modules/$(shell uname -r)/build
 CC = gcc
-TARGET1 = event_open_default
-TARGET2 = event_open_raw
-RM = rm -rf
+TARGET = event_open_user
+obj-m += event_open_kernel.o
 
-all: $(TARGET1) $(TARGET2)
+all: kernel user
 
-$(TARGET1): $(TARGET1).c
-	$(CC) -o $(TARGET1) $(TARGET1).c
+kernel:
+	$(MAKE) -C $(KDIR) SUBDIRS=$(PWD) modules
 
-$(TARGET2): $(TARGET2).c
-	$(CC) -o $(TARGET2) $(TARGET2).c
+user: $(TARGET).c
+	$(CC) -o $(TARGET) $(TARGET).c
 
 clean:
-	$(RM) $(TARGET1) $(TARGET2)
+	rm -rf *.o *.ko *.mod.* *.cmd .module* modules* Module* .*.cmd .tmp* $(TARGET)
+
