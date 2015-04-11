@@ -2,7 +2,17 @@
 # File Name: perf_count.py
 
 """
-	This file is used to count and calculate the performance events
+	This file is used to count the uncore performance events
+	This is not finished. But it does not support process-wide. 
+	events:
+		CAS_COUNT.RD: uncore_imc_X/event=0x4,umask=0x3/
+		CAS_COUNT.WR: uncore_imc_X/event=0x4,umask=0xc/
+		PRE_COUNT.PAGE_MISS: uncore_imc_X/event=0x2,umask=0x1/
+		ACT_COUNT: uncore_imc_0/event=0x1/
+	Calculation:
+		iMC.PCT_REQUESTS_PAGE_MISS = PRE_COUNT.PAGE_MISS / (CAS_COUNT.RD + CAS_COUNT.WR)
+		iMC.PCT_REQUESTS_PAGE_EMPTY = (ACT_COUNT - PRE_COUNT.PAGE_MISS)/ (CAS_COUNT.RD + CAS_COUNT.WR)
+		iMC.PCT_REQUESTS_PAGE_HIT = 1 - iMC.PCT_REQUESTS_PAGE_MISS - iMC.PCT_REQUESTS_PAGE_EMPTY
 """
 
 import os
@@ -128,5 +138,5 @@ if __name__ == "__main__":
 	CONCURRENCY = args.concurrency
 	ROUND_NR = args.round_nr
 	INTERVAL = args.interval
-	OPTIONS = ":" + args.options
-	main(sys.argv[1:])
+			    help="specify how long for each round")
+	parser.add_argument("-o", "--options", default="ukG",
