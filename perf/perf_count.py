@@ -25,19 +25,22 @@ def median(lst):
 	lst.sort()
         return lst[len(lst)/2]
 
+def mean(lst):
+	return sum(lst)/float(len(lst))
+
 def init_event_list():
-#	event_list.append('cpu-cycles')
+	event_list.append('instructions')
 #	event_list.append('cache-references')
-#	event_list.append('L1-dcache-loads')
+	event_list.append('L1-dcache-loads')
 #	event_list.append('L1-dcache-load-misses')
-#	event_list.append('L1-dcache-stores')
+	event_list.append('L1-dcache-stores')
 #	event_list.append('L1-dcache-store-misses')
 #	event_list.append('L1-dcache-prefetch-misses')
 #	event_list.append('L1-icache-load-misses')
 	event_list.append('LLC-loads')
-#	event_list.append('LLC-load-misses')
-#	event_list.append('LLC-stores')
-#	event_list.append('LLC-store-misses')
+	event_list.append('LLC-stores')
+	event_list.append('LLC-load-misses')
+	event_list.append('LLC-store-misses')
 #	event_list.append('LLC-prefetches')
 #	event_list.append('LLC-prefetch-misses')
 #	event_list.append('dTLB-loads')
@@ -106,10 +109,11 @@ def main(argv):
 	process("output")
 
 	result = open('data', 'a')
-	for i in range(ROUND_NR):
-		result.writelines("%d "% (item[i]) for item in event_value)
+#	for i in range(ROUND_NR):
+#		result.writelines("%d "% (item[i]) for item in event_value)
+	result.writelines("%d "% (mean(item)) for item in event_value)
 #	result.writelines("%d "% (median(item)) for item in event_value)
-		result.writelines("\n")
+#		result.writelines("\n")
 	result.close()
 
 if __name__ == "__main__":
@@ -122,7 +126,7 @@ if __name__ == "__main__":
 			    help="specify how many rounds you want to counter")
 	parser.add_argument("-i", "--interval", default="0.1",
 			    help="specify how long for each round")
-	parser.add_argument("-o", "--options", default="ukG",
+	parser.add_argument("-o", "--options", default="uk",
 			    help="what to measure for perf")
 	args = parser.parse_args()
 
