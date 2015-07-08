@@ -16,7 +16,7 @@ import argparse
 CONCURRENCY = 0
 INTERVAL = ""
 TOTAL_TIME = ""
-SOCKET_NR = 2
+SOCKET_NR = 1
 
 event_list = []
 event_value = []
@@ -94,6 +94,8 @@ if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
 	parser.add_argument("-c", "--concurrency", type=int, default=50,
 			    help="specify how many counters concurrently")
+	parser.add_argument("-s", "--socket", type=int, default=1,
+			    help="specify the number of sockets on this server")
 	parser.add_argument("-t", "--time", default="10",
 			    help="specify the total time (s)")
 	parser.add_argument("-i", "--interval", default="1000",
@@ -103,4 +105,5 @@ if __name__ == "__main__":
 	CONCURRENCY = args.concurrency
 	TOTAL_TIME = args.time
 	INTERVAL = args.interval
+	SOCKET_NR = args.socket
 	main(sys.argv[1:])
