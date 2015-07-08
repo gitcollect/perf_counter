@@ -4,6 +4,20 @@
 """
 	This file is used to count and calculate the uncore performance events
 	Uncore events can only be supported system-wide.
+
+	events:
+		CAS_COUNT.RD: uncore_imc_X/event=0x4,umask=0x3/
+		CAS_COUNT.WR: uncore_imc_X/event=0x4,umask=0xc/
+		PRE_COUNT.PAGE_MISS: uncore_imc_X/event=0x2,umask=0x1/
+		ACT_COUNT: uncore_imc_X/event=0x1/
+	Calculation:
+		iMC.MEM_BW_READS = CAS_COUNT.RD * 64
+		iMC.MEM_BW_WRITES = CAS_COUNT.WR * 64
+		iMC.MEM_BW_TOTAL = iMC.MEM_BW_READS + iMC.MEM_BW_WRITES
+		iMC.PCT_REQUESTS_PAGE_MISS = PRE_COUNT.PAGE_MISS / (CAS_COUNT.RD + CAS_COUNT.WR)
+		iMC.PCT_REQUESTS_PAGE_EMPTY = (ACT_COUNT - PRE_COUNT.PAGE_MISS)/ (CAS_COUNT.RD + CAS_COUNT.WR)
+		iMC.PCT_REQUESTS_PAGE_HIT = 1 - iMC.PCT_REQUESTS_PAGE_MISS - iMC.PCT_REQUESTS_PAGE_EMPTY
+
 """
 
 import os
@@ -33,6 +47,21 @@ def init_event_list():
 	event_list.append('uncore_imc_1/event=0x4,umask=0x3/')
 	event_list.append('uncore_imc_2/event=0x4,umask=0x3/')
 	event_list.append('uncore_imc_3/event=0x4,umask=0x3/')
+
+	event_list.append('uncore_imc_0/event=0x4,umask=0xc/')
+	event_list.append('uncore_imc_1/event=0x4,umask=0xc/')
+	event_list.append('uncore_imc_2/event=0x4,umask=0xc/')
+	event_list.append('uncore_imc_3/event=0x4,umask=0xc/')
+
+	event_list.append('uncore_imc_0/event=0x2,umask=0x1/')
+	event_list.append('uncore_imc_1/event=0x2,umask=0x1/')
+	event_list.append('uncore_imc_2/event=0x2,umask=0x1/')
+	event_list.append('uncore_imc_3/event=0x2,umask=0x1/')
+
+	event_list.append('uncore_imc_0/event=0x1/')
+	event_list.append('uncore_imc_1/event=0x1/')
+	event_list.append('uncore_imc_2/event=0x1/')
+	event_list.append('uncore_imc_3/event=0x1/')
 
 	for i in range(len(event_list)*SOCKET_NR):
 		event_value.append([])
